@@ -63,17 +63,20 @@ Use an imported PDF whose parent has author + year + title.
 
 ## 6b. Auto-classification
 
-- [ ] **Auto-classify selected items…** on a mix of items → preview shows counts
-      for Main PDF / Supplement, an "left unchanged" count, and example renames;
-      Cancel aborts with no changes.
+- [ ] **Auto-classify selected items…** → a **scan progress bar** appears, then a
+      preview shows Main PDF / Supplement counts, a "left unchanged" count, and
+      example renames; Cancel aborts with no changes.
 - [ ] Confirm proceed, choose **roles only** → roles written, no files renamed.
-- [ ] Confirm proceed, choose **rename PDFs** → matched PDFs renamed (Main tag = `Main`).
-- [ ] Detection is conservative: the **lone PDF** under an item → Main PDF;
-      `*supp*` / `*supplement*` / `*supporting information*` → Supplement;
-      `.csv` / `.py` / images / a second unnamed PDF → **left unchanged**.
-- [ ] A Main PDF whose title contains "data"/"figure" is NOT misfiled.
-- [ ] **Auto-classify entire library…** on a small test library → preview counts
-      match; applying updates only matched attachments; summary is correct.
+- [ ] Confirm proceed, choose **rename PDFs** → matched PDFs renamed (Main tag = `Main`);
+      an **apply progress bar** runs to completion (window does not vanish silently).
+- [ ] Detection is content-based (first page): a real article PDF whose first page
+      shows the journal name **and** a DOI → Main PDF.
+- [ ] A PDF whose first page says "Supplementary Information" / "Supporting
+      Information" / "Supplement" / "补充材料" → Supplement.
+- [ ] A PDF with a DOI but **no parent journal metadata** → left unchanged.
+- [ ] A non-PDF, or a PDF with no readable text → left unchanged.
+- [ ] **Auto-classify entire library…** on a small test library → scan + apply
+      progress bars both show; counts match; only matched attachments change.
 - [ ] Library scan re-classifies even attachments that already had a role.
 - [ ] Selection with no Main/Supplement matches → clear "nothing changed" notice.
 

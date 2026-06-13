@@ -73,44 +73,32 @@
     return out;
   }
 
-  /** Build classification plan entries for a list of attachments. */
-  async function buildPlan(attachments) {
-    // Pre-count PDF siblings per parent for the "only PDF" heuristic.
-    const pdfCountByParent = new Map();
-    for (const att of attachments) {
-      try {
-        const pid = att.parentItemID || 0;
-        const ext = (att.attachmentFilename || "").toLowerCase();
-        const isPdf =
-          (ZA.Compat.contentType(att) || "").toLowerCase() === "application/pdf" ||
-          /\.pdf$/.test(ext);
-        if (isPdf) pdfCountByParent.set(pid, (pdfCountByParent.get(pid) || 0) + 1);
-      } catch (e) {
-        /* ignore */
-      }
-    }
-
+  /**
+   * Build classification plan entries for a list of attachments.
+   * Classification reads first-page PDF text, so this is the slow phase —
+   * `onProgress(done, total)` is called so the caller can show a progress bar.
+   */
+  async function buildPlan(attachments, onProgress) {
     const plan = [];
+    const total = attachments.length;
+    let i = 0;
     for (const att of attachments) {
+      i += 1;
       try {
-        const pid = att.parentItemID || 0;
-        const detectedRole = ZA.Classifier.classify(att, {
-          pdfSiblingCount: pdfCountByParent.get(pid) || 0,
-        });
-        // Conservative classifier: null => leave this attachment untouched.
-        if (!detectedRole) continue;
-        const currentRole = ZA.RoleStore.getRole(att);
-        const name = ZA.RoleManager.attachmentDisplayName(att);
+        const parent = await ZA.Compat.getParentItem(att);
+        // Content-based classifier (async): null => leave untouched.
+        const detectedRole = await ZA.Classifier.classify(att, { parent });
+        if (detectedRole) {
+          const currentRole = ZA.RoleStore.getRole(att);
+          const name = ZA.RoleManager.attachmentDisplayName(att);
 
-        const ext = (att.attachmentFilename || "").toLowerCase();
-        const isPdf =
-          (ZA.Compat.contentType(att) || "").toLowerCase() === "application/pdf" ||
-          /\.pdf$/.test(ext);
+          const ext = (att.attachmentFilename || "").toLowerCase();
+          const isPdf =
+            (ZA.Compat.contentType(att) || "").toLowerCase() === "application/pdf" ||
+            /\.pdf$/.test(ext);
 
-        let proposedName = null;
-        if (isPdf) {
-          const parent = await ZA.Compat.getParentItem(att);
-          if (parent) {
+          let proposedName = null;
+          if (isPdf && parent) {
             proposedName = ZA.Filename.render(ZA.Prefs.getString("filenameTemplate"), {
               firstAuthorLastName: ZA.Filename.firstAuthorLastName(parent),
               year: ZA.Filename.year(parent),
@@ -118,11 +106,18 @@
               role: ZA.Roles.tag(detectedRole) || "Other",
             });
           }
-        }
 
-        plan.push({ item: att, name, currentRole, detectedRole, isPdf, proposedName });
+          plan.push({ item: att, name, currentRole, detectedRole, isPdf, proposedName });
+        }
       } catch (e) {
         Log.warn("buildPlan entry failed", e);
+      }
+      if (onProgress) {
+        try {
+          onProgress(i, total);
+        } catch (e) {
+          /* ignore */
+        }
       }
     }
     return plan;
@@ -176,20 +171,13 @@
     return lines.join("\n");
   }
 
-  async function applyPlan(plan, mode, parentWindow) {
+  async function applyPlan(plan, mode) {
     const summary = { succeeded: 0, skipped: 0, failed: 0, details: [] };
     const total = plan.length;
 
-    let pw = null;
-    let progress = null;
-    try {
-      pw = new Zotero.ProgressWindow({ closeOnClick: true });
-      pw.changeHeadline(bilingual("ZotAssets 自动分类中…", "ZotAssets classifying…"));
-      progress = new pw.ItemProgress("", "0 / " + total);
-      pw.show();
-    } catch (e) {
-      Log.warn("progress window failed", e);
-    }
+    const prog = ZA.UI.progress(
+      bilingual("ZotAssets 应用中…", "ZotAssets applying…")
+    );
 
     let i = 0;
     for (const entry of plan) {
@@ -216,24 +204,10 @@
         res = { status: "failed", reasonKey: "result.failed.generic", name: entry.name };
       }
       ZA.RoleManager._tally(summary, res);
-
-      if (progress && (i % 10 === 0 || i === total)) {
-        try {
-          progress.setText(i + " / " + total);
-        } catch (e) {
-          /* ignore */
-        }
-      }
+      prog.update(i, total);
     }
 
-    if (pw) {
-      try {
-        pw.startCloseTimer(1500);
-      } catch (e) {
-        /* ignore */
-      }
-    }
-
+    prog.close(1200);
     ZA.UI.summary(summary);
     return summary;
   }
@@ -244,10 +218,6 @@
     /** Entry point: scan whole library, preview, confirm, apply. */
     async runLibrary(win) {
       try {
-        ZA.UI.toast(
-          bilingual("ZotAssets", "ZotAssets"),
-          bilingual("正在扫描整个文献库…", "Scanning the whole library…")
-        );
         const attachments = await getAllAttachments();
         await this._previewAndApply(win, attachments);
       } catch (e) {
@@ -276,7 +246,16 @@
         return;
       }
 
-      const plan = await buildPlan(attachments);
+      // Scanning reads first-page PDF text and can be slow on big libraries,
+      // so show a determinate progress bar instead of leaving the UI blank.
+      const scanProg = ZA.UI.progress(
+        bilingual("ZotAssets 扫描中…", "ZotAssets scanning…")
+      );
+      const plan = await buildPlan(attachments, (done, total) =>
+        scanProg.update(done, total)
+      );
+      scanProg.close(400);
+
       if (!plan.length) {
         ZA.UI.alert(
           "ZotAssets",
@@ -319,7 +298,7 @@
         doRename = false;
       }
 
-      await applyPlan(plan, doRename ? "rename" : "rolesonly", win);
+      await applyPlan(plan, doRename ? "rename" : "rolesonly");
     },
   };
 

@@ -205,6 +205,36 @@
       }
     },
 
+    /**
+     * Extract text from the first `maxPages` pages of a PDF attachment.
+     * Tries Zotero's PDF worker first (true page-scoped extraction), then falls
+     * back to the indexed full-text content (approximated by a head slice).
+     * Returns "" on any failure — callers treat empty as "unknown".
+     */
+    async getPdfHeadText(item, maxPages) {
+      const pages = maxPages || 1;
+      // 1) Page-accurate extraction via the PDF worker (Zotero 7+).
+      try {
+        if (typeof Zotero.PDFWorker !== "undefined" && Zotero.PDFWorker &&
+            typeof Zotero.PDFWorker.getFullText === "function") {
+          const res = await Zotero.PDFWorker.getFullText(item.id, pages);
+          if (res && res.text) return String(res.text);
+        }
+      } catch (e) {
+        Log.warn("PDFWorker.getFullText failed; trying indexed text", e);
+      }
+      // 2) Fallback: indexed full text (head slice approximates the first page).
+      try {
+        if ("attachmentText" in item) {
+          const t = await item.attachmentText;
+          if (t) return String(t).slice(0, 4000);
+        }
+      } catch (e) {
+        Log.warn("attachmentText failed", e);
+      }
+      return "";
+    },
+
     async getParentItem(item) {
       try {
         const parentID = item.parentItemID;
