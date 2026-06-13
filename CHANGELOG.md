@@ -6,6 +6,16 @@ All notable changes to ZotAssets are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-06-14
+
+### Fixed
+- Auto-classification now only operates on Zotero `journalArticle` parent
+  items. Theses, conference papers, books, and other item types are left
+  unchanged, so they do not receive automatic role suffixes.
+- Progress windows now show visible `done / total` text and percentage from
+  the start of both the scan and apply phases, avoiding blank-looking progress
+  windows during auto-classification.
+
 ## [0.3.0] - 2026-06-14
 
 ### Changed
@@ -97,7 +107,8 @@ Initial prototype.
 - Build scripts: PowerShell (`build.ps1`, no Node) and Node (`build.js`).
 - README, testing checklist, and `update.json` template.
 
-[Unreleased]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Lyz-623/ZotAssets/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/Lyz-623/ZotAssets/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Lyz-623/ZotAssets/compare/v0.1.0...v0.2.0

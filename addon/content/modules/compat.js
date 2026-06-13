@@ -250,6 +250,38 @@
       }
     },
 
+    /** Zotero internal item type name, e.g. "journalArticle" or "book". */
+    itemTypeName(item) {
+      try {
+        if (!item) return "";
+        if (item.itemTypeID && Zotero.ItemTypes &&
+            typeof Zotero.ItemTypes.getName === "function") {
+          const name = Zotero.ItemTypes.getName(item.itemTypeID);
+          if (name) return String(name);
+        }
+      } catch (e) {
+        /* fall through */
+      }
+      try {
+        if (item && item.itemType) return String(item.itemType);
+      } catch (e) {
+        /* fall through */
+      }
+      try {
+        if (item && typeof item.getField === "function") {
+          return String(item.getField("itemType") || "");
+        }
+      } catch (e) {
+        /* ignore */
+      }
+      return "";
+    },
+
+    /** Auto-classification is intentionally journal-article only. */
+    isJournalArticle(item) {
+      return this.itemTypeName(item) === "journalArticle";
+    },
+
     async saveItem(item) {
       try {
         await item.saveTx();

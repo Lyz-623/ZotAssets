@@ -11,6 +11,9 @@
  *   - "main_pdf"    — the first page contains BOTH a DOI and the parent item's
  *                     journal name (publicationTitle / journalAbbreviation).
  *
+ * Auto-classification is journal-article only. Theses, conference papers, books
+ * and other parent item types are left untouched.
+ *
  * Anything else (including PDFs whose text cannot be read, and all non-PDFs)
  * returns `null` => "leave untouched; set manually". The other roles (Data,
  * Code, Figure, Translation, Scan, Published, AcceptedMS, Preprint, Other)
@@ -98,6 +101,7 @@
     async classify(item, ctx) {
       try {
         const context = ctx || {};
+        if (!ZA.Compat.isJournalArticle(context.parent)) return null;
         if (!ZA.Compat.isFileAttachment(item)) return null;
 
         let filename = "";

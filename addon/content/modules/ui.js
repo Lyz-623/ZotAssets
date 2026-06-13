@@ -23,18 +23,24 @@
       try {
         pw = new Zotero.ProgressWindow({ closeOnClick: true });
         pw.changeHeadline(base);
-        ip = new pw.ItemProgress("", "");
+        ip = new pw.ItemProgress("", "0 / 0");
+        if (ip && typeof ip.setProgress === "function") {
+          ip.setProgress(0);
+        }
         pw.show();
       } catch (e) {
         Log.warn("progress create failed", e);
       }
       return {
-        update(done, total) {
+        update(done, total, text) {
           try {
             const pct = total > 0 ? Math.round((done * 100) / total) : 0;
             if (pw) pw.changeHeadline(base + "  " + done + " / " + total);
+            if (ip && typeof ip.setText === "function") {
+              ip.setText(text || (done + " / " + total + " (" + pct + "%)"));
+            }
             if (ip && typeof ip.setProgress === "function") {
-              ip.setProgress(Math.min(100, Math.max(1, pct)));
+              ip.setProgress(Math.min(100, Math.max(0, pct)));
             }
           } catch (e) {
             /* ignore */

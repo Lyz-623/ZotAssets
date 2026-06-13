@@ -22,6 +22,33 @@
     return lang === "zh" ? zh : en;
   }
 
+  async function yieldToUI() {
+    try {
+      if (Zotero.Promise && typeof Zotero.Promise.delay === "function") {
+        await Zotero.Promise.delay(1);
+        return;
+      }
+    } catch (e) {
+      /* fall through */
+    }
+    await new Promise((resolve) => {
+      if (typeof setTimeout === "function") {
+        setTimeout(resolve, 1);
+      } else {
+        Services.tm.dispatchToMainThread(resolve);
+      }
+    });
+  }
+
+  function reportProgress(onProgress, done, total) {
+    if (!onProgress) return;
+    try {
+      onProgress(done, total);
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
   async function getAllAttachments() {
     const out = [];
     let libs = [];
@@ -86,6 +113,10 @@
       i += 1;
       try {
         const parent = await ZA.Compat.getParentItem(att);
+        if (!ZA.Compat.isJournalArticle(parent)) {
+          reportProgress(onProgress, i, total);
+          continue;
+        }
         // Content-based classifier (async): null => leave untouched.
         const detectedRole = await ZA.Classifier.classify(att, { parent });
         if (detectedRole) {
@@ -112,13 +143,7 @@
       } catch (e) {
         Log.warn("buildPlan entry failed", e);
       }
-      if (onProgress) {
-        try {
-          onProgress(i, total);
-        } catch (e) {
-          /* ignore */
-        }
-      }
+      reportProgress(onProgress, i, total);
     }
     return plan;
   }
@@ -144,6 +169,12 @@
     );
     const lines = [header, ""];
     lines.push(bilingual("共扫描附件：", "Attachments scanned: ") + (scanned || plan.length));
+    lines.push(
+      bilingual(
+        "仅处理期刊论文；学位论文、会议论文和书籍保持不变。",
+        "Journal articles only; theses, conference papers and books are left unchanged."
+      )
+    );
     lines.push(
       bilingual("仅自动识别：正文 PDF / 补充材料", "Auto-detected only: Main PDF / Supplement")
     );
@@ -178,6 +209,8 @@
     const prog = ZA.UI.progress(
       bilingual("ZotAssets 应用中…", "ZotAssets applying…")
     );
+    prog.update(0, total);
+    await yieldToUI();
 
     let i = 0;
     for (const entry of plan) {
@@ -251,17 +284,19 @@
       const scanProg = ZA.UI.progress(
         bilingual("ZotAssets 扫描中…", "ZotAssets scanning…")
       );
+      scanProg.update(0, attachments.length);
+      await yieldToUI();
       const plan = await buildPlan(attachments, (done, total) =>
         scanProg.update(done, total)
       );
-      scanProg.close(400);
+      scanProg.close(900);
 
       if (!plan.length) {
         ZA.UI.alert(
           "ZotAssets",
           bilingual(
-            "未识别到正文 PDF 或补充材料，已保持不变。\n（其他类型请手动设置角色。）",
-            "No Main PDF or Supplement detected; nothing changed.\n(Set other types manually.)"
+            "未在期刊论文中识别到正文 PDF 或补充材料，已保持不变。\n（学位论文、会议论文和书籍不会自动加后缀。）",
+            "No Main PDF or Supplement detected in journal articles; nothing changed.\n(Theses, conference papers and books are not auto-suffixed.)"
           )
         );
         return;
