@@ -6,6 +6,21 @@ All notable changes to ZotAssets are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-06-14
+
+### Changed
+- Reworked auto-classification to decide roles per parent item rather than per
+  PDF in isolation. ZotAssets now scores all PDF attachments under the same
+  journal article, chooses a clearly strongest Main PDF first, and only then
+  marks remaining strong SI candidates as Supplement.
+- Made Supplement detection stricter: ordinary article text such as
+  "supplementary information is available" no longer counts as strong SI
+  evidence. Single-PDF items are only marked Supplement when the file name or
+  opening title explicitly indicates SI.
+- Parent titles are no longer length-truncated in generated filenames, so
+  `{parentTitle}` uses the complete Zotero parent-item title after filename-safe
+  character cleanup.
+
 ## [0.3.3] - 2026-06-14
 
 ### Changed
@@ -131,7 +146,8 @@ Initial prototype.
 - Build scripts: PowerShell (`build.ps1`, no Node) and Node (`build.js`).
 - README, testing checklist, and `update.json` template.
 
-[Unreleased]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.3...HEAD
+[Unreleased]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.4...HEAD
+[0.3.4]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.0...v0.3.1

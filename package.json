@@ -1,6 +1,6 @@
 {
   "name": "zotassets",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Zotero plugin to manage attachment asset roles, auto-classify libraries, and auto-rename PDFs. Compatible with Zotero 7, 8 and 9.",
   "license": "MIT",
   "author": "ZotAssets",

@@ -42,8 +42,6 @@
       "(^|[\\r\\n])\\s*supplementary\\s+(information|materials?|methods?|figures?|tables?|appendix)\\s*[:：]?(?=[\\r\\n]|$)",
       "(^|[\\r\\n])\\s*supplemental\\s+(information|materials?|methods?|figures?|tables?)\\s*[:：]?(?=[\\r\\n]|$)",
       "(^|[\\r\\n])\\s*supporting\\s+information\\s*[:：]?(?=[\\r\\n]|$)",
-      "\\bsupplementary\\s+(information|materials?)\\s+(for|to)\\b",
-      "\\bsupporting\\s+information\\s+(for|to)\\b",
       "(^|[\\r\\n])\\s*(补充材料|补充信息|补充说明|补充数据|支持信息)\\b",
     ].join("|"),
     "i"
@@ -109,18 +107,26 @@
     const opening = head.slice(0, 450);
     const evidence = [];
     let score = 0;
+    let strong = false;
+    let openingTitle = false;
+    let filenameHit = false;
 
     if (SUPPLEMENT_FILENAME_RE.test(filename || "")) {
       score += 5;
+      strong = true;
+      filenameHit = true;
       evidence.push("supplement-filename");
     }
     if (/^\s*(supplementary|supplemental)\s+(information|materials?)\b/i.test(opening) ||
         /^\s*supporting\s+information\b/i.test(opening)) {
       score += 6;
+      strong = true;
+      openingTitle = true;
       evidence.push("supplement-opening-title");
     }
     if (SUPPLEMENT_HEADING_RE.test(head)) {
       score += 6;
+      strong = true;
       evidence.push("supplement-heading");
     }
     if (SUPPLEMENT_FIGURE_RE.test(head)) {
@@ -128,7 +134,7 @@
       evidence.push("supplement-numbered-figure");
     }
 
-    return { score, evidence };
+    return { score, evidence, strong, openingTitle, filenameHit };
   }
 
   function mainEvidence(parent, text) {
@@ -176,18 +182,28 @@
       evidence.push("doi-plus-journal");
     }
 
-    return { score, evidence };
+    return {
+      score,
+      evidence,
+      hasTitle,
+      hasDoi,
+      hasJournal,
+      hasAbstract,
+      hasKeywords,
+      hasMeta,
+    };
   }
 
   function decideRole(supplement, main) {
-    if (supplement.score >= 5) {
+    if (supplement.strong && supplement.score >= 6 &&
+        !(main.hasTitle && main.score >= 9 && !supplement.openingTitle && !supplement.filenameHit)) {
       return {
         role: "supplement",
         confidence: supplement.score,
         evidence: supplement.evidence,
       };
     }
-    if (main.score >= 7 && supplement.score < 5) {
+    if (main.score >= 7 && (!supplement.strong || main.score >= supplement.score + 3)) {
       return {
         role: "main_pdf",
         confidence: main.score,
@@ -195,6 +211,29 @@
       };
     }
     return { role: null, confidence: 0, evidence: [] };
+  }
+
+  function emptyResult(extra) {
+    const base = {
+      role: null,
+      confidence: 0,
+      evidence: [],
+      mainScore: 0,
+      supplementScore: 0,
+      mainEvidence: [],
+      supplementEvidence: [],
+      hasParentTitle: false,
+      hasDoi: false,
+      hasJournal: false,
+      hasAbstract: false,
+      strongSupplement: false,
+      supplementOpeningTitle: false,
+      supplementFilename: false,
+    };
+    if (extra) {
+      for (const key of Object.keys(extra)) base[key] = extra[key];
+    }
+    return base;
   }
 
   const Classifier = {
@@ -213,10 +252,10 @@
       try {
         const context = ctx || {};
         if (!ZA.Compat.isJournalArticle(context.parent)) {
-          return { role: null, confidence: 0, evidence: [] };
+          return emptyResult();
         }
         if (!ZA.Compat.isFileAttachment(item)) {
-          return { role: null, confidence: 0, evidence: [] };
+          return emptyResult();
         }
 
         let filename = "";
@@ -227,21 +266,37 @@
         }
         const ext = extOf(filename);
         if (!this.isPdf(item, ext)) {
-          return { role: null, confidence: 0, evidence: [] };
+          return emptyResult();
         }
 
         const text = await ZA.Compat.getPdfHeadText(item, 2);
         const supplement = supplementEvidence(filename, text || "");
         if (!text && supplement.score < 5) {
-          return { role: null, confidence: 0, evidence: [] };
+          return emptyResult();
         }
         const main = text
           ? mainEvidence(context.parent, text)
           : { score: 0, evidence: [] };
-        return decideRole(supplement, main);
+        const decision = decideRole(supplement, main);
+        return {
+          role: decision.role,
+          confidence: decision.confidence,
+          evidence: decision.evidence,
+          mainScore: main.score || 0,
+          supplementScore: supplement.score || 0,
+          mainEvidence: main.evidence || [],
+          supplementEvidence: supplement.evidence || [],
+          hasParentTitle: !!main.hasTitle,
+          hasDoi: !!main.hasDoi,
+          hasJournal: !!main.hasJournal,
+          hasAbstract: !!main.hasAbstract,
+          strongSupplement: !!supplement.strong,
+          supplementOpeningTitle: !!supplement.openingTitle,
+          supplementFilename: !!supplement.filenameHit,
+        };
       } catch (e) {
         Log.warn("classifyDetailed failed", e);
-        return { role: null, confidence: 0, evidence: [] };
+        return emptyResult();
       }
     },
 

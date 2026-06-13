@@ -71,6 +71,16 @@
               "strict_max_version": "9.*"
             }
           }
+        },
+        {
+          "version": "0.3.4",
+          "update_link": "https://github.com/Lyz-623/ZotAssets/releases/download/v0.3.4/ZotAssets-0.3.4.xpi",
+          "applications": {
+            "zotero": {
+              "strict_min_version": "6.999",
+              "strict_max_version": "9.*"
+            }
+          }
         }
       ]
     }

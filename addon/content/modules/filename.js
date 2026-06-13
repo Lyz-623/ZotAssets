@@ -33,7 +33,9 @@
      * characters, strips control chars, trims trailing dots/spaces, avoids
      * reserved names, and bounds the length.
      */
-    sanitizeComponent(input, fallback) {
+    sanitizeComponent(input, fallback, options) {
+      const opts = options || {};
+      const maxLength = typeof opts.maxLength === "number" ? opts.maxLength : MAX_COMPONENT;
       let s = input === undefined || input === null ? "" : String(input);
 
       // Normalize whitespace.
@@ -56,8 +58,8 @@
         s = "_" + s;
       }
 
-      if (s.length > MAX_COMPONENT) {
-        s = s.slice(0, MAX_COMPONENT).replace(/[.\s]+$/, "");
+      if (maxLength > 0 && s.length > maxLength) {
+        s = s.slice(0, maxLength).replace(/[.\s]+$/, "");
       }
       return s;
     },
@@ -135,7 +137,7 @@
             /* ignore */
           }
         }
-        return this.sanitizeComponent(title, fallback);
+        return this.sanitizeComponent(title, fallback, { maxLength: 0 });
       } catch (e) {
         Log.warn("parentTitle failed", e);
         return fallback;
@@ -165,7 +167,8 @@
         ),
         parentTitle: this.sanitizeComponent(
           fields.parentTitle,
-          ZA.Strings ? ZA.Strings.get("fallback.title") : "Untitled"
+          ZA.Strings ? ZA.Strings.get("fallback.title") : "Untitled",
+          { maxLength: 0 }
         ),
         role: roleInput === "" ? "" : this.sanitizeComponent(roleInput, "Other"),
       };
