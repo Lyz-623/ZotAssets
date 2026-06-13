@@ -1,0 +1,6 @@
+# Normalize line endings: source files use LF in the repo.
+* text=auto eol=lf
+
+# Binary assets must never be normalized.
+*.png binary
+*.xpi binary

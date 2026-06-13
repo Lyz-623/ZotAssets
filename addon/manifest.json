@@ -1,0 +1,24 @@
+{
+  "manifest_version": 2,
+  "name": "ZotAssets",
+  "version": "0.1.0",
+  "description": "Manage attachment asset roles (Main PDF, Supplement, Data, Code, ...) and auto-rename PDFs based on a template. Compatible with Zotero 7, 8 and 9.",
+  "author": "ZotAssets",
+  "homepage_url": "https://github.com/Lyz-623/ZotAssets",
+  "icons": {
+    "48": "content/icons/icon48.png",
+    "96": "content/icons/icon96.png"
+  },
+  "applications": {
+    "zotero": {
+      "id": "zotassets@yunze.dev",
+      "update_url": "https://github.com/Lyz-623/ZotAssets/releases/latest/download/update.json",
+      "strict_min_version": "6.999",
+      "strict_max_version": "9.*"
+    },
+    "gecko": {
+      "id": "zotassets@yunze.dev",
+      "strict_min_version": "60.9"
+    }
+  }
+}

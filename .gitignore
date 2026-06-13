@@ -1,0 +1,14 @@
+# Build output
+/build/
+/dist/
+
+# Node
+/node_modules/
+npm-debug.log*
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
