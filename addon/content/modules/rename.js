@@ -104,12 +104,12 @@
         // Capture the original file name exactly once before the first rename.
         ZA.RoleStore.rememberOriginalFilename(item, oldLeaf);
 
-        const tag = Roles.tag(roleId) || "Other";
+        const tag = Roles.filenameTag(roleId, parent);
         const desired = Filename.render(ZA.Prefs.getString("filenameTemplate"), {
           firstAuthorLastName: Filename.firstAuthorLastName(parent),
           year: Filename.year(parent),
           parentTitle: Filename.parentTitle(parent),
-          role: tag,
+          role: tag === null ? "Other" : tag,
         });
 
         const dir = Compat.parentDir(path);

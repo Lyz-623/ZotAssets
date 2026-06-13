@@ -49,6 +49,48 @@
     }
   }
 
+  function parentKey(entry) {
+    try {
+      return entry && entry.parent ? String(entry.parent.id || entry.parent.key || "") : "";
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function disambiguateMainPdfs(plan) {
+    const mainsByParent = new Map();
+    for (const entry of plan) {
+      if (entry.detectedRole !== "main_pdf") continue;
+      const key = parentKey(entry);
+      if (!key) continue;
+      if (!mainsByParent.has(key)) mainsByParent.set(key, []);
+      mainsByParent.get(key).push(entry);
+    }
+
+    const drop = new Set();
+    for (const entries of mainsByParent.values()) {
+      if (entries.length <= 1) continue;
+      entries.sort((a, b) => {
+        const ac = a.classification ? a.classification.confidence || 0 : 0;
+        const bc = b.classification ? b.classification.confidence || 0 : 0;
+        return bc - ac;
+      });
+      const top = entries[0];
+      const second = entries[1];
+      const topScore = top.classification ? top.classification.confidence || 0 : 0;
+      const secondScore = second.classification ? second.classification.confidence || 0 : 0;
+
+      // Keep one main PDF only when the evidence is clearly stronger. If not,
+      // leave all main candidates untouched rather than risk choosing wrong.
+      if (topScore >= 8 && topScore >= secondScore + 2) {
+        for (let i = 1; i < entries.length; i += 1) drop.add(entries[i]);
+      } else {
+        for (const entry of entries) drop.add(entry);
+      }
+    }
+    return plan.filter((entry) => !drop.has(entry));
+  }
+
   async function getAllAttachments() {
     const out = [];
     let libs = [];
@@ -118,7 +160,10 @@
           continue;
         }
         // Content-based classifier (async): null => leave untouched.
-        const detectedRole = await ZA.Classifier.classify(att, { parent });
+        const classification = ZA.Classifier.classifyDetailed
+          ? await ZA.Classifier.classifyDetailed(att, { parent })
+          : { role: await ZA.Classifier.classify(att, { parent }), confidence: 0, evidence: [] };
+        const detectedRole = classification.role;
         if (detectedRole) {
           const currentRole = ZA.RoleStore.getRole(att);
           const name = ZA.RoleManager.attachmentDisplayName(att);
@@ -130,22 +175,32 @@
 
           let proposedName = null;
           if (isPdf && parent) {
+            const tag = ZA.Roles.filenameTag(detectedRole, parent);
             proposedName = ZA.Filename.render(ZA.Prefs.getString("filenameTemplate"), {
               firstAuthorLastName: ZA.Filename.firstAuthorLastName(parent),
               year: ZA.Filename.year(parent),
               parentTitle: ZA.Filename.parentTitle(parent),
-              role: ZA.Roles.tag(detectedRole) || "Other",
+              role: tag === null ? "Other" : tag,
             });
           }
 
-          plan.push({ item: att, name, currentRole, detectedRole, isPdf, proposedName });
+          plan.push({
+            item: att,
+            parent,
+            name,
+            currentRole,
+            detectedRole,
+            isPdf,
+            proposedName,
+            classification,
+          });
         }
       } catch (e) {
         Log.warn("buildPlan entry failed", e);
       }
       reportProgress(onProgress, i, total);
     }
-    return plan;
+    return disambiguateMainPdfs(plan);
   }
 
   function buildPreviewText(plan, scanned) {

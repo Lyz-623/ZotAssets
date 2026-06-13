@@ -282,6 +282,33 @@
       return this.itemTypeName(item) === "journalArticle";
     },
 
+    itemField(item, field) {
+      try {
+        if (item && typeof item.getField === "function") {
+          return String(item.getField(field) || "");
+        }
+      } catch (e) {
+        /* ignore */
+      }
+      return "";
+    },
+
+    isChineseItem(item) {
+      if (!item) return false;
+      const fields = [
+        this.itemField(item, "language"),
+        this.itemField(item, "title"),
+        this.itemField(item, "publicationTitle"),
+        this.itemField(item, "journalAbbreviation"),
+      ].join(" ");
+      return /\b(zh|zho|chi|chinese|中文|汉语|漢語)\b/i.test(fields) ||
+        /[\u3400-\u9fff]/.test(fields);
+    },
+
+    isChineseJournalArticle(item) {
+      return this.isJournalArticle(item) && this.isChineseItem(item);
+    },
+
     async saveItem(item) {
       try {
         await item.saveTx();

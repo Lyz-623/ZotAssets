@@ -52,6 +52,21 @@
       return r ? r.tag : null;
     },
 
+    /**
+     * Role tag for generated filenames/titles. Chinese journal articles should
+     * not receive a visible type suffix, but the role is still stored.
+     */
+    filenameTag(id, parentItem) {
+      try {
+        if (ZA.Compat && ZA.Compat.isChineseJournalArticle(parentItem)) {
+          return "";
+        }
+      } catch (e) {
+        /* fall through */
+      }
+      return this.tag(id);
+    },
+
     /** Localized display name for the current Strings language. */
     label(id) {
       const r = BY_ID.get(id);

@@ -151,6 +151,9 @@
      */
     render(template, fields) {
       const tpl = template || ZA.Prefs.DEFAULTS.filenameTemplate;
+      const roleInput = fields.role === undefined || fields.role === null
+        ? null
+        : String(fields.role);
       const safe = {
         firstAuthorLastName: this.sanitizeComponent(
           fields.firstAuthorLastName,
@@ -164,7 +167,7 @@
           fields.parentTitle,
           ZA.Strings ? ZA.Strings.get("fallback.title") : "Untitled"
         ),
-        role: this.sanitizeComponent(fields.role, "Other"),
+        role: roleInput === "" ? "" : this.sanitizeComponent(roleInput, "Other"),
       };
 
       let name = tpl
@@ -181,8 +184,8 @@
         .replace(ILLEGAL, " ")
         .replace(CONTROL, "")
         .replace(/\s+/g, " ")
-        .replace(/^[.\s]+/, "")
-        .replace(/[.\s]+$/, "");
+        .replace(/^[._\-\s]+/, "")
+        .replace(/[._\-\s]+$/, "");
       if (!name) name = "Attachment";
       return name + ".pdf";
     },

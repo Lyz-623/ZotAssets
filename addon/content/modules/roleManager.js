@@ -53,8 +53,6 @@
     async applyTitleDisplay(item, roleId) {
       try {
         if (!ZA.Prefs.getBool("showRoleInTitle")) return false;
-        const tag = ZA.Roles.tag(roleId);
-        if (!tag) return false;
 
         let title = "";
         try {
@@ -68,6 +66,17 @@
           } catch (e) {
             title = "";
           }
+        }
+        const parent = await ZA.Compat.getParentItem(item);
+        const tag = ZA.Roles.filenameTag(roleId, parent);
+        if (!tag) {
+          const base = stripTitleRoleLabel(title);
+          if (base && base !== title) {
+            item.setField("title", base);
+            await ZA.Compat.saveItem(item);
+            return true;
+          }
+          return false;
         }
         item.setField("title", titleWithRoleLabel(title, tag));
         await ZA.Compat.saveItem(item);

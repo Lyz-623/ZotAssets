@@ -6,6 +6,20 @@ All notable changes to ZotAssets are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-06-14
+
+### Changed
+- Reworked automatic Main PDF vs Supplement detection to use conservative
+  evidence scoring instead of broad single-keyword matches. Supplement
+  detection now requires strong SI signals from the file name, opening title, or
+  first-page SI figure/table markers; Main PDF detection uses parent title, DOI,
+  journal name, abstract/摘要, keywords, and article metadata.
+- Added per-parent Main PDF disambiguation: when multiple PDFs in one item look
+  like possible main files, ZotAssets only auto-selects a clearly stronger
+  candidate and otherwise leaves them unchanged for manual review.
+- Chinese journal articles keep stored roles but no longer get visible role
+  suffixes in generated filenames or attachment titles.
+
 ## [0.3.2] - 2026-06-14
 
 ### Fixed
@@ -117,7 +131,8 @@ Initial prototype.
 - Build scripts: PowerShell (`build.ps1`, no Node) and Node (`build.js`).
 - README, testing checklist, and `update.json` template.
 
-[Unreleased]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.2...HEAD
+[Unreleased]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.3...HEAD
+[0.3.3]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Lyz-623/ZotAssets/compare/v0.2.1...v0.3.0
