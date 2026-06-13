@@ -13,6 +13,22 @@
 
   // Matches a trailing " [SomeTag]" label added for in-title display.
   const TITLE_SUFFIX = /\s*\[[^\]]*\]\s*$/;
+  // Matches a role label inserted before a PDF extension, e.g. "File [Main].pdf".
+  const PDF_TITLE_SUFFIX = /\s*\[[^\]]*\](\.pdf)\s*$/i;
+
+  function stripTitleRoleLabel(title) {
+    return String(title || "")
+      .replace(TITLE_SUFFIX, "")
+      .replace(PDF_TITLE_SUFFIX, "$1");
+  }
+
+  function titleWithRoleLabel(title, tag) {
+    const base = stripTitleRoleLabel(title) || "Attachment";
+    if (/\.pdf$/i.test(base)) {
+      return base.replace(/(\.pdf)$/i, " [" + tag + "]$1");
+    }
+    return base + " [" + tag + "]";
+  }
 
   function attachmentDisplayName(item) {
     try {
@@ -53,9 +69,7 @@
             title = "";
           }
         }
-        const base = title.replace(TITLE_SUFFIX, "");
-        const newTitle = (base ? base : "Attachment") + " [" + tag + "]";
-        item.setField("title", newTitle);
+        item.setField("title", titleWithRoleLabel(title, tag));
         await ZA.Compat.saveItem(item);
         return true;
       } catch (e) {
@@ -73,8 +87,7 @@
         } catch (e) {
           return false;
         }
-        if (!TITLE_SUFFIX.test(title)) return false;
-        const base = title.replace(TITLE_SUFFIX, "");
+        const base = stripTitleRoleLabel(title);
         if (base && base !== title) {
           item.setField("title", base);
           await ZA.Compat.saveItem(item);

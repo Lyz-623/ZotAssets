@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "ZotAssets",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Manage attachment asset roles (Main PDF, Supplement, Data, Code, ...), auto-classify a whole library, and auto-rename PDFs based on a template. Compatible with Zotero 7, 8 and 9.",
   "author": "ZotAssets",
   "homepage_url": "https://github.com/Lyz-623/ZotAssets",

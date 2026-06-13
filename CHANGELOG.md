@@ -6,6 +6,16 @@ All notable changes to ZotAssets are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-06-14
+
+### Fixed
+- Role labels shown in attachment titles for unrenamed PDF files are now placed
+  before the `.pdf` extension (`Title [Supplement].pdf`) instead of after it
+  (`Title.pdf [Supplement]`).
+- Clearing or rewriting a title role label now removes both the old trailing
+  format and the corrected pre-extension format, so existing affected titles can
+  be normalized by applying the role again.
+
 ## [0.3.1] - 2026-06-14
 
 ### Fixed
@@ -107,7 +117,8 @@ Initial prototype.
 - Build scripts: PowerShell (`build.ps1`, no Node) and Node (`build.js`).
 - README, testing checklist, and `update.json` template.
 
-[Unreleased]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/Lyz-623/ZotAssets/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Lyz-623/ZotAssets/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/Lyz-623/ZotAssets/compare/v0.2.0...v0.2.1
