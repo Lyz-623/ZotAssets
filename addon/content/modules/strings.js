@@ -16,11 +16,15 @@
   const TABLE = {
     en: {
       "menu.root": "ZotAssets",
+      "menu.autoSelection": "Auto-classify selected items…",
+      "menu.autoLibrary": "Auto-classify entire library…",
       "menu.editRole": "Edit role…",
       "menu.setRole": "Set role",
       "menu.clearRole": "Clear role",
       "menu.renameByRole": "Rename by role",
       "menu.settings": "Settings…",
+      "clear.restorePrompt":
+        "Also restore the original file names for cleared attachments?\n\n[OK] = restore original names\n[Cancel] = keep current names",
 
       "dialog.title": "ZotAssets – Edit role",
       "dialog.heading": "Attachment asset role",
@@ -34,8 +38,10 @@
       "summary.detailsHeader": "Details:",
 
       "result.renamed": "Renamed to: %name%",
+      "result.restored": "Original file name restored.",
       "result.roleSaved": "Role saved (no rename).",
       "result.cleared": "Role cleared.",
+      "result.skipped.noOriginal": "No original file name stored.",
       "result.skipped.notAttachment": "Not a file attachment.",
       "result.skipped.notPdf": "Role saved; only PDFs are auto-renamed.",
       "result.skipped.linkedFile": "Linked file – renaming disabled in settings.",
@@ -57,11 +63,15 @@
 
     zh: {
       "menu.root": "ZotAssets",
+      "menu.autoSelection": "自动识别选中项…",
+      "menu.autoLibrary": "自动识别整个文献库…",
       "menu.editRole": "编辑角色…",
       "menu.setRole": "设置角色",
       "menu.clearRole": "清除角色",
       "menu.renameByRole": "按角色重命名",
       "menu.settings": "设置…",
+      "clear.restorePrompt":
+        "是否同时把这些附件的文件名恢复为原始文件名？\n\n[确定] = 恢复原始文件名\n[取消] = 保留当前文件名",
 
       "dialog.title": "ZotAssets – 编辑角色",
       "dialog.heading": "附件资产角色",
@@ -75,8 +85,10 @@
       "summary.detailsHeader": "详情：",
 
       "result.renamed": "已重命名为：%name%",
+      "result.restored": "已恢复原始文件名。",
       "result.roleSaved": "已保存角色（未重命名）。",
       "result.cleared": "已清除角色。",
+      "result.skipped.noOriginal": "未保存原始文件名。",
       "result.skipped.notAttachment": "不是文件附件。",
       "result.skipped.notPdf": "已保存角色；仅对 PDF 自动重命名。",
       "result.skipped.linkedFile": "链接文件 – 设置中未启用重命名。",

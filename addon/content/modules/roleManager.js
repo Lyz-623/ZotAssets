@@ -89,9 +89,11 @@
 
     /**
      * Set (or change) the role of a single attachment.
+     * @param {Object} [opts] { forceRename } — bypass the autoRenamePdf pref.
      * Returns: { status, reasonKey, oldName, newName, name }
      */
-    async setRole(item, roleId) {
+    async setRole(item, roleId, opts) {
+      const options = opts || {};
       const name = attachmentDisplayName(item);
       try {
         if (!ZA.Roles.isValid(roleId)) {
@@ -105,7 +107,9 @@
         ZA.RoleStore.setRole(item, roleId);
 
         // 2) Try to rename PDFs (engine enforces all PDF/linked/auto rules).
-        const renameResult = await ZA.Rename.renameForRole(item, roleId, { force: false });
+        const renameResult = await ZA.Rename.renameForRole(item, roleId, {
+          force: !!options.forceRename,
+        });
 
         if (renameResult.status === "renamed") {
           // Title already updated to match the new file name; no extra label.
@@ -137,8 +141,13 @@
       }
     },
 
-    /** Clear the role of a single attachment (does not rename files back). */
-    async clearRole(item) {
+    /**
+     * Clear the role of a single attachment.
+     * @param {Object} [opts] { restoreFilename } — also rename the file back to
+     *   the original name captured before the first rename (if available).
+     */
+    async clearRole(item, opts) {
+      const options = opts || {};
       const name = attachmentDisplayName(item);
       try {
         if (!ZA.Compat.isAttachment(item)) {
@@ -146,6 +155,17 @@
         }
         ZA.RoleStore.clearRole(item);
         await this.stripTitleDisplay(item);
+
+        if (options.restoreFilename) {
+          const restore = await ZA.Rename.restoreOriginal(item);
+          // Only surface a restore-specific outcome when it actually did/needed something.
+          if (restore.status === "renamed") {
+            return { status: "cleared", reasonKey: "result.cleared", name };
+          }
+          if (restore.status === "failed") {
+            return { status: "failed", reasonKey: restore.reasonKey, name };
+          }
+        }
         return { status: "cleared", reasonKey: "result.cleared", name };
       } catch (e) {
         Log.error("clearRole failed", e);
@@ -205,11 +225,11 @@
       return summary;
     },
 
-    async clearRoleBatch(items) {
+    async clearRoleBatch(items, opts) {
       const summary = this._emptySummary();
       for (const item of items) {
         // eslint-disable-next-line no-await-in-loop
-        const res = await this.clearRole(item);
+        const res = await this.clearRole(item, opts);
         this._tally(summary, res);
       }
       return summary;

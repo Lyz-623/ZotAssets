@@ -19,6 +19,7 @@
     showRoleInTitle: true,
     filenameTemplate: "{firstAuthorLastName}_{year}_{parentTitle}_{role}.pdf",
     language: "auto", // "auto" | "en" | "zh"
+    useCustomDialog: false, // use the XHTML role dialog instead of the native picker
     // Internal persistence blob (managed by RoleStore). Default empty object.
     roleData: "{}",
   };

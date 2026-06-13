@@ -154,6 +154,63 @@
       }
     },
 
+    /**
+     * Restore the attachment's file to the original name captured before the
+     * first rename. Returns { status, reasonKey, oldName, newName }.
+     */
+    async restoreOriginal(item) {
+      const Compat = ZA.Compat;
+      const result = { status: "skipped", reasonKey: "result.skipped.noOriginal", oldName: null, newName: null };
+      try {
+        const original = ZA.RoleStore.getOriginalFilename(item);
+        if (!original) {
+          return result;
+        }
+        if (!Compat.isFileAttachment(item)) {
+          result.reasonKey = "result.skipped.notAttachment";
+          return result;
+        }
+        if (Compat.isLinkedFileAttachment(item) && !ZA.Prefs.getBool("renameLinkedFiles")) {
+          result.reasonKey = "result.skipped.linkedFile";
+          return result;
+        }
+        const path = await Compat.getFilePath(item);
+        if (!path) {
+          result.status = "failed";
+          result.reasonKey = "result.failed.noFile";
+          return result;
+        }
+        const oldLeaf = Compat.leafName(path);
+        result.oldName = oldLeaf;
+        if (oldLeaf === original) {
+          // Already named correctly; just sync the title.
+          await this._setTitle(item, original);
+          result.status = "renamed";
+          result.reasonKey = "result.restored";
+          result.newName = original;
+          return result;
+        }
+        const dir = Compat.parentDir(path);
+        const uniqueLeaf = await ZA.Filename.ensureUnique(dir, original, path);
+        const renameResult = await Compat.renameAttachmentFile(item, uniqueLeaf);
+        if (!renameResult.ok) {
+          result.status = "failed";
+          result.reasonKey = "result.failed.rename";
+          return result;
+        }
+        await this._setTitle(item, uniqueLeaf);
+        result.status = "renamed";
+        result.reasonKey = "result.restored";
+        result.newName = uniqueLeaf;
+        return result;
+      } catch (e) {
+        Log.error("restoreOriginal threw", e);
+        result.status = "failed";
+        result.reasonKey = "result.failed.generic";
+        return result;
+      }
+    },
+
     async _setTitle(item, title) {
       try {
         item.setField("title", title);

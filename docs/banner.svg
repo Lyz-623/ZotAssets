@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 260" role="img" aria-label="ZotAssets">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#26466e"/>
+      <stop offset="1" stop-color="#3b7dd8"/>
+    </linearGradient>
+    <linearGradient id="chip" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.06"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="260" rx="20" fill="url(#bg)"/>
+  <g transform="translate(56,56)">
+    <rect width="148" height="148" rx="28" fill="url(#chip)" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2"/>
+    <text x="74" y="98" font-family="Segoe UI, Arial, sans-serif" font-size="74" font-weight="700" fill="#ffffff" text-anchor="middle">ZA</text>
+  </g>
+  <g font-family="Segoe UI, Arial, sans-serif" fill="#ffffff">
+    <text x="248" y="118" font-size="64" font-weight="700">ZotAssets</text>
+    <text x="250" y="166" font-size="28" fill="#dbe7fb">Attachment asset roles &amp; automatic PDF renaming for Zotero</text>
+    <text x="250" y="206" font-size="26" fill="#bcd2f4">Zotero 附件资产角色管理与 PDF 自动重命名 · 兼容 Zotero 7 / 8 / 9</text>
+  </g>
+  <g transform="translate(980,150)" font-family="Segoe UI, Arial, sans-serif">
+    <rect x="0" y="-26" width="64" height="40" rx="8" fill="#ffffff" fill-opacity="0.14"/>
+    <text x="32" y="2" font-size="22" font-weight="600" fill="#ffffff" text-anchor="middle">7</text>
+    <rect x="76" y="-26" width="64" height="40" rx="8" fill="#ffffff" fill-opacity="0.14"/>
+    <text x="108" y="2" font-size="22" font-weight="600" fill="#ffffff" text-anchor="middle">8</text>
+    <rect x="152" y="-26" width="64" height="40" rx="8" fill="#ffffff" fill-opacity="0.14"/>
+    <text x="184" y="2" font-size="22" font-weight="600" fill="#ffffff" text-anchor="middle">9</text>
+  </g>
+</svg>

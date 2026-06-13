@@ -61,6 +61,20 @@ Use an imported PDF whose parent has author + year + title.
 - [ ] Summary dialog reports correct **succeeded / skipped / failed** counts.
 - [ ] Failed/skipped rows list a per-item reason.
 
+## 6b. Auto-classification
+
+- [ ] **Auto-classify selected items…** on a mix of items → preview shows per-role
+      counts and example renames; Cancel aborts with no changes.
+- [ ] Confirm proceed, choose **roles only** → roles written, no files renamed.
+- [ ] Confirm proceed, choose **rename PDFs** → PDFs renamed per template.
+- [ ] Filenames drive detection: `*_supp.pdf` → Supplement, `*.csv` → Data,
+      `*.py` → Code, image files → Figure, `*arxiv*` → Preprint, the lone PDF
+      under an item → Main PDF.
+- [ ] **Auto-classify entire library…** on a small test library → preview counts
+      match; applying updates all attachments; summary is correct.
+- [ ] Library scan re-classifies even attachments that already had a role.
+- [ ] Running on an empty/attachment-less selection → clear "no attachments" notice.
+
 ## 7. Settings
 
 - [ ] `autoRenamePdf=false` → setting a role on a PDF saves the role but does not

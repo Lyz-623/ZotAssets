@@ -30,6 +30,8 @@
     "filename.js",
     "rename.js",
     "roleManager.js",
+    "classifier.js",
+    "autoClassify.js",
     "ui.js",
     "dialog.js",
     "menu.js",

@@ -3,9 +3,11 @@
  *
  * Injects a "ZotAssets" submenu into Zotero's item context menu
  * (#zotero-itemmenu) for each main window. Provides:
- *   - Edit role…       (single attachment -> dialog)
+ *   - Auto-classify selected items…   (heuristic, preview-first)
+ *   - Auto-classify entire library…   (heuristic, preview-first)
+ *   - Edit role…       (single attachment -> native picker)
  *   - Set role ▸ <list> (single or batch quick-set)
- *   - Clear role        (single or batch)
+ *   - Clear role        (single or batch; can restore original file names)
  *   - Rename by role    (single or batch)
  *
  * Visibility is decided on popupshowing based on the current selection.
@@ -20,8 +22,7 @@
   const ROOT_MENU_ID = ID_PREFIX + "itemmenu";
   const SEPARATOR_ID = ID_PREFIX + "separator";
 
-  // Per-window bookkeeping so we can cleanly remove everything on shutdown.
-  // Map<Window, { elements: Element[], onPopup: Function, popup: Element }>
+  // Map<Window, { elements: Element[], onPopup: Function, popup: Element, refs: Object }>
   const registry = new Map();
 
   function doc(win) {
@@ -33,24 +34,30 @@
     if (typeof d.createXULElement === "function") {
       return d.createXULElement(tag);
     }
-    // Extremely defensive fallback for unexpected hosts.
     return d.createElementNS(
       "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
       tag
     );
   }
 
-  /** Return the selected attachment items in the active pane of `win`. */
-  function getSelectedAttachments(win) {
+  function getSelectedItems(win) {
     try {
       const pane = win.ZoteroPane;
       if (!pane || typeof pane.getSelectedItems !== "function") return [];
-      const items = pane.getSelectedItems() || [];
-      return items.filter((it) => ZA.Compat.isAttachment(it));
+      return pane.getSelectedItems() || [];
     } catch (e) {
-      Log.warn("getSelectedAttachments failed", e);
+      Log.warn("getSelectedItems failed", e);
       return [];
     }
+  }
+
+  function getSelectedAttachments(win) {
+    return getSelectedItems(win).filter((it) => ZA.Compat.isAttachment(it));
+  }
+
+  function bilingual(zh, en) {
+    const lang = ZA.Strings ? ZA.Strings.lang() : "en";
+    return lang === "zh" ? zh : en;
   }
 
   const Menu = {
@@ -67,13 +74,11 @@
         const elements = [];
         const Strings = ZA.Strings;
 
-        // Separator.
         const sep = createXUL(win, "menuseparator");
         sep.id = SEPARATOR_ID;
         popup.appendChild(sep);
         elements.push(sep);
 
-        // Root submenu.
         const rootMenu = createXUL(win, "menu");
         rootMenu.id = ROOT_MENU_ID;
         rootMenu.setAttribute("label", Strings.get("menu.root"));
@@ -82,14 +87,30 @@
         popup.appendChild(rootMenu);
         elements.push(rootMenu);
 
-        // Edit role… (single).
+        // --- Automation (always available) ---
+        const autoSel = createXUL(win, "menuitem");
+        autoSel.id = ID_PREFIX + "auto-selection";
+        autoSel.setAttribute("label", Strings.get("menu.autoSelection"));
+        autoSel.addEventListener("command", () => Menu._onAutoSelection(win));
+        rootPopup.appendChild(autoSel);
+
+        const autoLib = createXUL(win, "menuitem");
+        autoLib.id = ID_PREFIX + "auto-library";
+        autoLib.setAttribute("label", Strings.get("menu.autoLibrary"));
+        autoLib.addEventListener("command", () => Menu._onAutoLibrary(win));
+        rootPopup.appendChild(autoLib);
+
+        const innerSep = createXUL(win, "menuseparator");
+        innerSep.id = ID_PREFIX + "inner-sep";
+        rootPopup.appendChild(innerSep);
+
+        // --- Per-attachment manual ops ---
         const editItem = createXUL(win, "menuitem");
         editItem.id = ID_PREFIX + "edit";
         editItem.setAttribute("label", Strings.get("menu.editRole"));
         editItem.addEventListener("command", () => Menu._onEditRole(win));
         rootPopup.appendChild(editItem);
 
-        // Set role ▸ <list>.
         const setMenu = createXUL(win, "menu");
         setMenu.id = ID_PREFIX + "set";
         setMenu.setAttribute("label", Strings.get("menu.setRole"));
@@ -104,25 +125,23 @@
         }
         rootPopup.appendChild(setMenu);
 
-        // Clear role.
         const clearItem = createXUL(win, "menuitem");
         clearItem.id = ID_PREFIX + "clear";
         clearItem.setAttribute("label", Strings.get("menu.clearRole"));
         clearItem.addEventListener("command", () => Menu._onClearRole(win));
         rootPopup.appendChild(clearItem);
 
-        // Rename by role.
         const renameItem = createXUL(win, "menuitem");
         renameItem.id = ID_PREFIX + "rename";
         renameItem.setAttribute("label", Strings.get("menu.renameByRole"));
         renameItem.addEventListener("command", () => Menu._onRenameByRole(win));
         rootPopup.appendChild(renameItem);
 
-        // popupshowing handler to toggle visibility/enablement.
-        const onPopup = () => Menu._onPopupShowing(win, { rootMenu, sep, editItem });
+        const refs = { rootMenu, sep, editItem, setMenu, clearItem, renameItem, autoSel };
+        const onPopup = () => Menu._onPopupShowing(win, refs);
         popup.addEventListener("popupshowing", onPopup);
 
-        registry.set(win, { elements, onPopup, popup });
+        registry.set(win, { elements, onPopup, popup, refs });
         Log.info("menu added to window");
       } catch (e) {
         Log.error("addToWindow failed", e);
@@ -150,19 +169,52 @@
 
     _onPopupShowing(win, refs) {
       try {
-        const attachments = getSelectedAttachments(win);
+        const selected = getSelectedItems(win);
+        const attachments = selected.filter((it) => ZA.Compat.isAttachment(it));
+        const hasSelection = selected.length > 0;
         const hasAttachment = attachments.length > 0;
         const single = attachments.length === 1;
-        refs.rootMenu.hidden = !hasAttachment;
-        refs.sep.hidden = !hasAttachment;
-        // Edit dialog only makes sense for exactly one attachment.
-        // Use the property (a stray disabled attribute disables regardless of value).
+
+        // Root + separator show whenever something is selected (auto-classify
+        // works on selections and on the whole library).
+        refs.rootMenu.hidden = !hasSelection;
+        refs.sep.hidden = !hasSelection;
+
+        // Selection auto-classify needs at least one attachment in the selection
+        // (directly, or as a child of selected items). Cheap check: any selected
+        // item is/has an attachment — we only gate on direct attachments here to
+        // stay fast; the handler re-derives the full set.
+        refs.autoSel.disabled = !hasSelection;
+
+        // Per-attachment ops require attachments.
         refs.editItem.disabled = !single;
+        refs.setMenu.disabled = !hasAttachment;
+        refs.clearItem.disabled = !hasAttachment;
+        refs.renameItem.disabled = !hasAttachment;
       } catch (e) {
         Log.warn("_onPopupShowing failed", e);
       }
     },
 
+    // ---- Automation handlers ----
+    async _onAutoSelection(win) {
+      try {
+        const items = getSelectedItems(win);
+        await ZA.AutoClassify.runSelection(win, items);
+      } catch (e) {
+        Log.error("_onAutoSelection failed", e);
+      }
+    },
+
+    async _onAutoLibrary(win) {
+      try {
+        await ZA.AutoClassify.runLibrary(win);
+      } catch (e) {
+        Log.error("_onAutoLibrary failed", e);
+      }
+    },
+
+    // ---- Manual handlers ----
     async _onEditRole(win) {
       try {
         const attachments = getSelectedAttachments(win);
@@ -172,7 +224,7 @@
         if (!roleId) return;
         const res = await ZA.RoleManager.setRole(item, roleId);
         ZA.UI.summary({
-          succeeded: res.status === "skipped" ? 0 : res.status === "failed" ? 0 : 1,
+          succeeded: res.status === "skipped" || res.status === "failed" ? 0 : 1,
           skipped: res.status === "skipped" ? 1 : 0,
           failed: res.status === "failed" ? 1 : 0,
           details: [res],
@@ -197,7 +249,27 @@
       try {
         const attachments = getSelectedAttachments(win);
         if (!attachments.length) return;
-        const summary = await ZA.RoleManager.clearRoleBatch(attachments);
+
+        // Offer to also restore original file names (uses captured originals).
+        let restoreFilename = false;
+        try {
+          const anyOriginal = attachments.some(
+            (it) => !!ZA.RoleStore.getOriginalFilename(it)
+          );
+          if (anyOriginal) {
+            restoreFilename = Services.prompt.confirm(
+              win,
+              ZA.Strings.get("menu.clearRole"),
+              ZA.Strings.get("clear.restorePrompt")
+            );
+          }
+        } catch (e) {
+          restoreFilename = false;
+        }
+
+        const summary = await ZA.RoleManager.clearRoleBatch(attachments, {
+          restoreFilename,
+        });
         ZA.UI.summary(summary);
       } catch (e) {
         Log.error("_onClearRole failed", e);
