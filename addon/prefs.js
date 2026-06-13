@@ -8,5 +8,5 @@
 pref("extensions.zotassets.autoRenamePdf", true);
 pref("extensions.zotassets.renameLinkedFiles", false);
 pref("extensions.zotassets.showRoleInTitle", true);
-pref("extensions.zotassets.filenameTemplate", "{firstAuthorLastName}_{year}_{parentTitle}__{role}.pdf");
+pref("extensions.zotassets.filenameTemplate", "{firstAuthorLastName}_{year}_{parentTitle}_{role}.pdf");
 pref("extensions.zotassets.language", "auto");

@@ -17,7 +17,7 @@
     autoRenamePdf: true,
     renameLinkedFiles: false,
     showRoleInTitle: true,
-    filenameTemplate: "{firstAuthorLastName}_{year}_{parentTitle}__{role}.pdf",
+    filenameTemplate: "{firstAuthorLastName}_{year}_{parentTitle}_{role}.pdf",
     language: "auto", // "auto" | "en" | "zh"
     // Internal persistence blob (managed by RoleStore). Default empty object.
     roleData: "{}",

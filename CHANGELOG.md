@@ -6,6 +6,12 @@ All notable changes to ZotAssets are documented here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+- Default PDF file-name template now uses a single underscore before the role
+  tag: `{firstAuthorLastName}_{year}_{parentTitle}_{role}.pdf` (was `__{role}`).
+  Existing custom `filenameTemplate` prefs are unaffected; only the default
+  changed.
+
 ## [0.1.0] - 2026-06-14
 
 Initial prototype.

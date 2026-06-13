@@ -35,15 +35,15 @@ When you set or change the role of a **PDF** attachment, the file is renamed
 using the template (default):
 
 ```
-{firstAuthorLastName}_{year}_{parentTitle}__{role}.pdf
+{firstAuthorLastName}_{year}_{parentTitle}_{role}.pdf
 ```
 
 Examples:
 
 ```
-Smith_2021_Deep Learning for Citation Analysis__MainPDF.pdf
-Smith_2021_Deep Learning for Citation Analysis__Supplement.pdf
-Smith_2021_Deep Learning for Citation Analysis__AcceptedMS.pdf
+Smith_2021_Deep Learning for Citation Analysis_MainPDF.pdf
+Smith_2021_Deep Learning for Citation Analysis_Supplement.pdf
+Smith_2021_Deep Learning for Citation Analysis_AcceptedMS.pdf
 ```
 
 Rules:
@@ -169,7 +169,7 @@ dedicated preference pane is added, edit them via Zotero's **Config Editor**
 | `autoRenamePdf`                     | bool    | `true`  | Auto-rename PDFs when a role changes |
 | `renameLinkedFiles`                 | bool    | `false` | Allow renaming **linked** files |
 | `showRoleInTitle`                   | bool    | `true`  | Show the role tag in the attachment title |
-| `filenameTemplate`                  | string  | `{firstAuthorLastName}_{year}_{parentTitle}__{role}.pdf` | PDF file-name template |
+| `filenameTemplate`                  | string  | `{firstAuthorLastName}_{year}_{parentTitle}_{role}.pdf` | PDF file-name template |
 | `language`                          | string  | `auto`  | `auto` \| `en` \| `zh` |
 | `roleData`                          | string  | `{}`    | Internal: JSON map of saved roles (do not edit by hand) |
 

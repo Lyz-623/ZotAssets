@@ -23,8 +23,8 @@ core rows on Zotero 8 / 9 betas as they become available. Logs are prefixed
 Use an imported PDF whose parent has author + year + title.
 
 - [ ] **Set role ▸ Main PDF** renames the file to
-      `<Surname>_<Year>_<Title>__MainPDF.pdf` and updates the title to match.
-- [ ] Changing to **Supplement** re-renames to `…__Supplement.pdf`.
+      `<Surname>_<Year>_<Title>_MainPDF.pdf` and updates the title to match.
+- [ ] Changing to **Supplement** re-renames to `…_Supplement.pdf`.
 - [ ] The role persists after **restarting Zotero**.
 - [ ] **Edit role…** dialog shows the **current role** and lets you pick a new one.
 
