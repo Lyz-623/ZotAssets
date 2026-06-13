@@ -33,7 +33,7 @@ Zotero 把它们一视同仁。ZotAssets 给每个附件一个**主资产角色*
 | Feature | Details / 说明 |
 |---|---|
 | Asset roles / 资产角色 | 11 built-in roles, one primary role per attachment. 内置 11 种角色，每个附件一个主角色。 |
-| Auto-classify / 自动识别 | Guess each attachment's role from file name, type, extension and context — for a selection or the whole library. 根据文件名、类型、扩展名和上下文自动判断角色，支持选中项或整库。 |
+| Auto-classify / 自动识别 | Conservatively auto-detects **only Main PDF and Supplement**; anything not confidently one of those is left untouched for you to set manually. Works on a selection or the whole library. 仅自动识别**正文 PDF 与补充材料**两类；不确定的附件保持不变、由你手动设置。支持选中项或整库。 |
 | Preview first / 先预览 | Library runs show a per-role count + example renames and require confirmation before anything changes. 整库运行会先显示各角色数量与重命名示例，确认后才执行。 |
 | PDF auto-rename / PDF 自动重命名 | Rename PDFs from a safe, cross-platform template; titles stay in sync. 按跨平台安全模板重命名 PDF，并同步标题。 |
 | Non-destructive / 不破坏数据 | Roles are stored separately; attachment path, notes and tags are never touched. 角色单独存储，不动附件路径、笔记和标签。 |
@@ -45,7 +45,7 @@ Zotero 把它们一视同仁。ZotAssets 给每个附件一个**主资产角色*
 
 | Role / 角色 | Tag (in file name) | 中文 |
 |---|---|---|
-| Main PDF | `MainPDF` | 正文 PDF |
+| Main PDF | `Main` | 正文 PDF |
 | Supplementary material | `Supplement` | 补充材料 |
 | Data | `Data` | 数据 |
 | Code | `Code` | 代码 |
@@ -82,11 +82,14 @@ Right-click any item or attachment to open the **ZotAssets** submenu.
 1. **Auto-classify selected items… / 自动识别选中项…** — classify the attachments
    of the selected items.
 2. **Auto-classify entire library… / 自动识别整个文献库…** — scan everything.
-3. A **preview / 预览** shows how many attachments map to each role and example
-   `old → new` renames.
-4. Confirm to proceed, then choose **rename PDFs / 重命名 PDF** or **roles only /
+3. Only **Main PDF** and **Supplement** are auto-detected; other attachments are
+   **left unchanged** for you to set manually. 仅识别**正文 PDF** 与**补充材料**，
+   其余保持不变、手动设置。
+4. A **preview / 预览** shows the per-role counts, how many are left unchanged,
+   and example `old → new` renames.
+5. Confirm to proceed, then choose **rename PDFs / 重命名 PDF** or **roles only /
    只写角色**.
-5. A progress window runs and a summary reports succeeded / skipped / failed.
+6. A progress window runs and a summary reports succeeded / skipped / failed.
 
 **Manual / 手动：**
 
@@ -109,7 +112,7 @@ template (default):
 Examples / 示例:
 
 ```
-Smith_2021_Deep Learning for Citation Analysis_MainPDF.pdf
+Smith_2021_Deep Learning for Citation Analysis_Main.pdf
 Smith_2021_Deep Learning for Citation Analysis_Supplement.pdf
 Smith_2021_Deep Learning for Citation Analysis_AcceptedMS.pdf
 ```

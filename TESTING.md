@@ -63,17 +63,19 @@ Use an imported PDF whose parent has author + year + title.
 
 ## 6b. Auto-classification
 
-- [ ] **Auto-classify selected items…** on a mix of items → preview shows per-role
-      counts and example renames; Cancel aborts with no changes.
+- [ ] **Auto-classify selected items…** on a mix of items → preview shows counts
+      for Main PDF / Supplement, an "left unchanged" count, and example renames;
+      Cancel aborts with no changes.
 - [ ] Confirm proceed, choose **roles only** → roles written, no files renamed.
-- [ ] Confirm proceed, choose **rename PDFs** → PDFs renamed per template.
-- [ ] Filenames drive detection: `*_supp.pdf` → Supplement, `*.csv` → Data,
-      `*.py` → Code, image files → Figure, `*arxiv*` → Preprint, the lone PDF
-      under an item → Main PDF.
+- [ ] Confirm proceed, choose **rename PDFs** → matched PDFs renamed (Main tag = `Main`).
+- [ ] Detection is conservative: the **lone PDF** under an item → Main PDF;
+      `*supp*` / `*supplement*` / `*supporting information*` → Supplement;
+      `.csv` / `.py` / images / a second unnamed PDF → **left unchanged**.
+- [ ] A Main PDF whose title contains "data"/"figure" is NOT misfiled.
 - [ ] **Auto-classify entire library…** on a small test library → preview counts
-      match; applying updates all attachments; summary is correct.
+      match; applying updates only matched attachments; summary is correct.
 - [ ] Library scan re-classifies even attachments that already had a role.
-- [ ] Running on an empty/attachment-less selection → clear "no attachments" notice.
+- [ ] Selection with no Main/Supplement matches → clear "nothing changed" notice.
 
 ## 7. Settings
 

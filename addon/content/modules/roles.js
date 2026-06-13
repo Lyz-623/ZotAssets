@@ -18,7 +18,7 @@
   const ZA = Zotero.ZotAssets;
 
   const ROLES = [
-    { id: "main_pdf", tag: "MainPDF", en: "Main PDF", zh: "正文 PDF" },
+    { id: "main_pdf", tag: "Main", en: "Main PDF", zh: "正文 PDF" },
     { id: "supplement", tag: "Supplement", en: "Supplementary material", zh: "补充材料" },
     { id: "data", tag: "Data", en: "Data", zh: "数据" },
     { id: "code", tag: "Code", en: "Code", zh: "代码" },

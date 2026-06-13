@@ -97,6 +97,8 @@
         const detectedRole = ZA.Classifier.classify(att, {
           pdfSiblingCount: pdfCountByParent.get(pid) || 0,
         });
+        // Conservative classifier: null => leave this attachment untouched.
+        if (!detectedRole) continue;
         const currentRole = ZA.RoleStore.getRole(att);
         const name = ZA.RoleManager.attachmentDisplayName(att);
 
@@ -126,7 +128,7 @@
     return plan;
   }
 
-  function buildPreviewText(plan) {
+  function buildPreviewText(plan, scanned) {
     const counts = {};
     let pdfRenames = 0;
     const examples = [];
@@ -139,15 +141,18 @@
         }
       }
     }
+    const unchanged = Math.max(0, (scanned || plan.length) - plan.length);
 
     const header = bilingual(
       "ZotAssets 自动分类预览",
       "ZotAssets auto-classify preview"
     );
     const lines = [header, ""];
+    lines.push(bilingual("共扫描附件：", "Attachments scanned: ") + (scanned || plan.length));
     lines.push(
-      bilingual("共扫描附件：", "Attachments scanned: ") + plan.length
+      bilingual("仅自动识别：正文 PDF / 补充材料", "Auto-detected only: Main PDF / Supplement")
     );
+    lines.push("");
     lines.push(bilingual("将写入的角色：", "Roles to assign:"));
     for (const role of ZA.Roles.all()) {
       const c = counts[role.id] || 0;
@@ -155,6 +160,9 @@
         lines.push("  " + ZA.Roles.label(role.id) + " (" + role.tag + "): " + c);
       }
     }
+    lines.push(
+      bilingual("保持不变（需手动设置）：", "Left unchanged (set manually): ") + unchanged
+    );
     lines.push("");
     lines.push(
       bilingual("可重命名的 PDF：", "PDFs eligible for rename: ") + pdfRenames
@@ -269,7 +277,17 @@
       }
 
       const plan = await buildPlan(attachments);
-      const previewText = buildPreviewText(plan);
+      if (!plan.length) {
+        ZA.UI.alert(
+          "ZotAssets",
+          bilingual(
+            "未识别到正文 PDF 或补充材料，已保持不变。\n（其他类型请手动设置角色。）",
+            "No Main PDF or Supplement detected; nothing changed.\n(Set other types manually.)"
+          )
+        );
+        return;
+      }
+      const previewText = buildPreviewText(plan, attachments.length);
       const title = bilingual("ZotAssets 自动分类", "ZotAssets auto-classify");
 
       // Step 1: proceed?

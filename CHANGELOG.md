@@ -6,6 +6,21 @@ All notable changes to ZotAssets are documented here. The format is based on
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-06-14
+
+### Changed
+- **Auto-classification is now conservative**: it only auto-detects **Main PDF**
+  and **Supplement**. Any attachment not confidently one of those is **left
+  unchanged** so the user can assign a role manually. This removes the
+  error-prone Data/Code/Figure/etc. auto-guessing.
+- **Main PDF file-name tag changed from `MainPDF` to `Main`** (e.g.
+  `Smith_2021_Title_Main.pdf`). Other role tags are unchanged.
+- Auto-classify preview now shows how many attachments are left unchanged, and a
+  clear notice when nothing was detected.
+
+### Notes
+- All 11 roles remain available for manual assignment (Edit role / Set role).
+
 ## [0.2.0] - 2026-06-14
 
 ### Added
@@ -60,6 +75,7 @@ Initial prototype.
 - Build scripts: PowerShell (`build.ps1`, no Node) and Node (`build.js`).
 - README, testing checklist, and `update.json` template.
 
-[Unreleased]: https://github.com/Lyz-623/ZotAssets/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Lyz-623/ZotAssets/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/Lyz-623/ZotAssets/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Lyz-623/ZotAssets/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Lyz-623/ZotAssets/releases/tag/v0.1.0
