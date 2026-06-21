@@ -7,7 +7,7 @@
 **EN:** A Zotero plugin for attachment asset roles, content-based PDF classification, and safe PDF renaming.<br>
 **中文：** 为 Zotero 附件标注资产角色，基于 PDF 内容识别正文和补充材料，并按模板安全重命名 PDF。
 
-[Latest release](https://github.com/Lyz-623/ZotAssets/releases/latest) | [Changelog](CHANGELOG.md) | [Support](#support--支持)
+[Latest release](https://github.com/Lyz-623/ZotAssets/releases/latest) | [Changelog](CHANGELOG.md) | [Support](SUPPORT.md)
 
 Compatible with **Zotero 7 / 8 / 9** | Bootstrapped plugin, no overlay
 
@@ -187,18 +187,9 @@ scripts/
 
 ## Support / 支持
 
-ZotAssets is free and open source. If it saves you time, a GitHub star is the best signal. If you would like to support future updates, you can also buy me a coffee.
+ZotAssets is free and open source. A GitHub star helps others find it. If it saves you time and you would like to support ongoing maintenance, you can sponsor the project on GitHub or buy me a coffee through the options in [SUPPORT.md](SUPPORT.md).
 
-ZotAssets 是免费开源项目。如果它帮你节省了时间，欢迎点一个 GitHub Star；也可以请我喝杯咖啡，支持后续维护。
-
-<details>
-<summary>Buy me a coffee / 请我喝杯咖啡</summary>
-
-| PayPal | WeChat Pay | Alipay |
-|:---:|:---:|:---:|
-| <img src="docs/donate/paypal.jpg" width="150" alt="PayPal QR"/> | <img src="docs/donate/wechat.jpg" width="150" alt="WeChat Pay QR"/> | <img src="docs/donate/alipay.jpg" width="150" alt="Alipay QR"/> |
-
-</details>
+ZotAssets 是免费开源项目。GitHub Star 可以帮助更多人发现它。如果它确实帮你节省了时间，也欢迎通过 [SUPPORT.md](SUPPORT.md) 中的方式请我喝杯咖啡，支持后续维护。
 
 ## License / 许可
 
