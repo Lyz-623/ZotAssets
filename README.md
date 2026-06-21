@@ -187,7 +187,7 @@ scripts/
 
 ## Support / 支持
 
-ZotAssets is free and open source. A GitHub star helps others find it. If it saves you time and you would like to support ongoing maintenance, you can sponsor the project on GitHub or buy me a coffee through the options in [SUPPORT.md](SUPPORT.md).
+ZotAssets is free and open source. A GitHub star helps others find it. If it saves you time and would like to support ongoing maintenance, you can buy me a coffee through the options in [SUPPORT.md](SUPPORT.md).
 
 ZotAssets 是免费开源项目。GitHub Star 可以帮助更多人发现它。如果它确实帮你节省了时间，也欢迎通过 [SUPPORT.md](SUPPORT.md) 中的方式请我喝杯咖啡，支持后续维护。
 

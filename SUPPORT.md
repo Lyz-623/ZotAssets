@@ -5,7 +5,7 @@
 **EN:** Help keep ZotAssets maintained, tested, and compatible with future Zotero releases.<br>
 **中文：** 支持 ZotAssets 的持续维护、测试，以及后续 Zotero 版本适配。
 
-[Sponsor on GitHub](https://github.com/sponsors/Lyz-623) · [Star the repository](https://github.com/Lyz-623/ZotAssets) · [Report an issue](https://github.com/Lyz-623/ZotAssets/issues)
+[Star the repository](https://github.com/Lyz-623/ZotAssets) · [Report an issue](https://github.com/Lyz-623/ZotAssets/issues)
 
 </div>
 
@@ -15,15 +15,15 @@
 
 | Method | Best for | Action |
 |---|---|---|
-| GitHub Sponsors | One-time or monthly support through GitHub | [Sponsor Lyz-623](https://github.com/sponsors/Lyz-623) |
 | GitHub Star | Helping more Zotero users discover the plugin | [Star ZotAssets](https://github.com/Lyz-623/ZotAssets) |
 | Issues / PRs | Bug reports, compatibility notes, translations, docs | [Open an issue](https://github.com/Lyz-623/ZotAssets/issues) |
+| Direct support | One-time support through PayPal, WeChat Pay, or Alipay | See the options below |
 
 | 方式 | 适合 | 操作 |
 |---|---|---|
-| GitHub Sponsors | 通过 GitHub 进行一次性或月度赞助 | [赞助 Lyz-623](https://github.com/sponsors/Lyz-623) |
 | GitHub Star | 帮助更多 Zotero 用户发现插件 | [给 ZotAssets 点 Star](https://github.com/Lyz-623/ZotAssets) |
 | Issues / PRs | 反馈问题、兼容性信息、翻译和文档改进 | [提交 Issue](https://github.com/Lyz-623/ZotAssets/issues) |
+| 直接支持 | 通过 PayPal、微信支付或支付宝进行一次性支持 | 见下方方式 |
 
 ## Buy Me A Coffee / 请我喝杯咖啡
 
@@ -37,11 +37,11 @@ If you prefer direct support, choose the method that is easiest for you. These o
 
 ## Notes / 说明
 
-- The repository Sponsor button is configured with GitHub's native `github:` funding entry, so it points to GitHub Sponsors directly instead of a custom external-links page.
+- GitHub Sponsors will be enabled after the maintainer account is enrolled in GitHub Sponsors.
 - PayPal, WeChat Pay, and Alipay are provided as direct alternatives for users in different regions.
 - ZotAssets stays free and open source regardless of sponsorship.
 
-- 仓库顶部的 Sponsor 按钮使用 GitHub 原生 `github:` 配置，目标是直接进入 GitHub Sponsors，而不是自定义外链弹窗。
+- GitHub Sponsors 会在维护者账号完成 GitHub Sponsors 开通后启用。
 - PayPal、微信支付和支付宝作为不同地区用户的直接支持方式。
 - 无论是否赞助，ZotAssets 都会保持免费开源。
 
