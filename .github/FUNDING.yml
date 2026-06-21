@@ -1,3 +1,4 @@
-# GitHub renders the repository Sponsor button from this file.
-# Add Ko-fi or Buy Me a Coffee here later if dedicated accounts are created.
+# Keep this file GitHub-native only.
+# Adding custom URLs here makes GitHub show an External links dialog instead of
+# sending users directly to GitHub Sponsors.
 github: Lyz-623
