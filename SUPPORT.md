@@ -37,11 +37,11 @@ If you prefer direct support, choose the method that is easiest for you. These o
 
 ## Notes / 说明
 
-- GitHub Sponsors will be enabled after the maintainer account is enrolled in GitHub Sponsors.
+- The repository Sponsor button opens this support page through GitHub's external funding-link dialog.
 - PayPal, WeChat Pay, and Alipay are provided as direct alternatives for users in different regions.
 - ZotAssets stays free and open source regardless of sponsorship.
 
-- GitHub Sponsors 会在维护者账号完成 GitHub Sponsors 开通后启用。
+- 仓库顶部的 Sponsor 按钮会通过 GitHub 的外部资助链接弹窗打开本支持页。
 - PayPal、微信支付和支付宝作为不同地区用户的直接支持方式。
 - 无论是否赞助，ZotAssets 都会保持免费开源。
 
